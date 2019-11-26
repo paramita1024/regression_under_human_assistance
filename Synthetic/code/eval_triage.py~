@@ -1,0 +1,46 @@
+from myutil import *
+import numpy as np
+import numpy.random as rand
+import numpy.linalg as LA
+from generate_data import generate_data 
+from triage import triage
+
+class eval_triage:
+	def __init__(self,data_file):
+		self.data=load_data(data_file)
+		
+		
+	def eval_loop(self,delta,num_nbr,param,res_file):
+		list_of_lamb=param['lamb']
+		list_of_K=param['K']
+		list_of_std=param['std']
+		res={}
+		for std in list_of_std:
+			test={'X':self.data.Xtest,'Y':self.data.Ytest,'human_pred':self.data.human_pred_test[str(std)]}
+			data_dict = {'test':test,'dist_mat':self.data.dist_mat,  'X':self.data.Xtrain,'Y':self.data.Ytrain,'human_pred':self.data.human_pred_train[str(std)]}
+			triage_obj=triage(data_dict)
+			res[str(std)]={}
+			for K in list_of_K:
+				res[str(std)][str(K)]={}
+				for lamb in list_of_lamb:
+#					res[str(std)][str(K)][str(lamb)] = triage_obj.algorithmic_triage({'delta':delta,'K':K,'lamb':lamb},num_nbr)
+					
+					res[str(std)][str(K)][str(lamb)] = triage_obj.algorithmic_triage_visualize_train({'delta':delta,'K':K,'lamb':lamb})
+		save(res,res_file)
+
+
+
+def main():
+	list_of_std=np.array([0.01])# [0.05,.1])#([.05,.1,.5])# np.array([.1])#([0.001,0.01,0.1,0.5,1]) 
+	list_of_K=[.4,.6,.8]#[0.1,0.2,0.3,.4,0.5,.6,.7,.8,.9,.99]#[0.2,.4,.6,.8]
+	list_of_lamb=[0.5]#,1.0]#[0.01,0.1,0.5,1.0]
+	param={'std':list_of_std,'K':list_of_K,'lamb':list_of_lamb}
+	delta=0.0001
+	num_nbr=10
+	data_file='../Synthetic_data/data_sigmoid' # Gauss'#sigmoid'
+	res_file='../Synthetic_data/res_sigmoid' # Gauss' #sigmoid'
+	obj=eval_triage(data_file)
+	obj.eval_loop(delta,num_nbr,param,res_file)
+
+if __name__=="__main__":
+	main()

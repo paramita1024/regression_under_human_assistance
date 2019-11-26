@@ -1,0 +1,111 @@
+from myutil import *
+import numpy as np
+import numpy.random as rand
+import numpy.linalg as LA
+import random
+
+class generate_data:
+	def __init__(self,n,dim,list_of_std):
+		self.n=n
+		self.dim=dim
+		self.list_of_std=list_of_std
+	
+	def generate_X(self):
+		self.X=rand.uniform(-1,1,(self.n,self.dim))
+
+	def white_Gauss(self,std=1):
+		return rand.normal(0,std,self.n)
+
+	def sigmoid(self,x):
+		return 1/float(1+np.exp(-x))
+		
+	def generate_Y_sigmoid(self):
+		self.w=rand.uniform(-1,1,self.dim)
+		self.Y=np.array(map(self.sigmoid,self.X.dot(self.w)))
+
+		# x=self.X
+		# y=self.Y
+		# plt.scatter(x,y,c='red')
+		# plt.show()
+
+	def generate_Y_Gauss(self):
+		self.w=rand.uniform(0,1,self.dim)
+		self.Y=self.X.dot(self.w)+self.white_Gauss(std=0.01)
+
+	def generate_Y_Mix_of_Gauss(self,no_Gauss,prob_Gauss):
+		self.Y=np.zeros(self.n)
+		for itr,p in zip(range(no_Gauss),prob_Gauss):
+			w=rand.uniform(0,1,self.dim)
+			self.Y += p*self.X.dot(w)
+
+	def generate_human_prediction(self):
+		
+		self.human_pred={}
+		for std in self.list_of_std:
+			self.human_pred[str(std)]=self.Y+self.white_Gauss(std=std)
+		# self.human_pred=self.Y+white_Gauss(std=0.01)
+
+	def split_data(self,frac):
+
+		indices=np.arange(self.n)
+		random.shuffle(indices)
+		num_train=int(frac*self.n)
+		indices_train=indices[:num_train]
+		indices_test=indices[num_train:]
+		self.Xtest=self.X[indices_test]
+		self.Xtrain=self.X[indices_train]
+		self.Ytrain=self.Y[indices_train]
+		self.Ytest=self.Y[indices_test]
+		self.human_pred_train={}
+		self.human_pred_test={}
+		for std in self.list_of_std:
+			self.human_pred_train[str(std)]=self.human_pred[str(std)][indices_train]
+			self.human_pred_test[str(std)]=self.human_pred[str(std)][indices_test]
+
+
+		n_test=self.Xtest.shape[0]
+		n_train=self.Xtrain.shape[0]
+		self.dist_mat=np.zeros((n_test,n_train))
+		for te in range(n_test):
+			for tr in range(n_train):
+				self.dist_mat[te,tr]=LA.norm(self.Xtest[te]-self.Xtrain[tr] )
+
+
+		
+def main():
+	n=100
+	dim=4
+	frac=0.8
+	option='sigmoid'
+	if option=='sigmoid':
+		list_of_std=np.array([.01])#([0.001,0.01,0.1,0.5,1]) 
+		obj=generate_data(n,dim,list_of_std)
+		obj.generate_X()
+		obj.generate_Y_sigmoid()
+		obj.generate_human_prediction()
+		obj.split_data(frac)
+		save(obj,'../Synthetic_data/data_sigmoid')
+		del obj
+	
+	
+	# generate sigmoid
+	if option=='Gauss':
+		list_of_std=np.array([.05,.1,.5])#([0.001,0.01,0.1,0.5,1]) 
+		obj=generate_data(n,dim,list_of_std)
+		obj.generate_X()
+		obj.generate_Y_Gauss()
+		obj.generate_human_prediction()
+		obj.split_data(frac)
+		save(obj,'../Synthetic_data/data_Gauss')
+		del obj
+
+	# gene<!-- <!-- ######rate gaussian
+#######	# obj=generate_data(n,dim)
+#######	# obj.generate_X()
+#######	# obj.generate_Y_Mix_of_Gauss(2,[.5,.5])
+#######	# obj.generate_human_prediction(list_of_std)
+#######	# save(obj,'../Synthetic_data/data_Mix_Gaussian')
+#######	# del obj
+######	 --> -->
+if __name__=="__main__":
+	main()

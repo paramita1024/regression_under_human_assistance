@@ -1,0 +1,61 @@
+from myutil import *
+import numpy as np
+import numpy.random as rand
+import numpy.linalg as LA
+
+
+class plot_triage:
+	def __init__(self,list_of_K,list_of_std, list_of_lamb):
+		self.list_of_K=list_of_K
+		self.list_of_std=list_of_std
+		self.list_of_lamb=list_of_lamb
+		
+
+	def extract_result(self,res_file,res_plot_file):
+		num_K=len(self.list_of_K)
+		res_saved=load_data(res_file)
+		res={}
+		for std in self.list_of_std:
+			res[str(std)]={}
+			for lamb in self.list_of_lamb:
+				res[str(std)][str(lamb)]=np.zeros((2,num_K))
+				for K,idx in zip(self.list_of_K,range(num_K)):
+					res[str(std)][str(lamb)][0][idx]=res_saved[str(std)][str(K)][str(lamb)]['avg_train_err']
+					res[str(std)][str(lamb)][1][idx]=res_saved[str(std)][str(K)][str(lamb)]['avg_test_err']
+		save(res,res_plot_file)
+
+	def plot_result(self,res_plot_file,image_file_prefix):
+		res=load_data(res_plot_file)
+		for std in self.list_of_std:
+			for lamb in self.list_of_lamb:
+				image_file=image_file_prefix+'std'+str(std)+'lamb'+str(lamb)+'.jpg'
+				self.plot_performance_vs_K(res[str(std)][str(lamb)],image_file,{'std':std,'lamb':lamb})
+
+
+	def plot_performance_vs_K(self,res,image_file,param):
+		plt.xticks(range(len(self.list_of_K)),self.list_of_K)
+		plt.plot(res[0],label='Train Error')
+		plt.plot(res[1],label='Test Error')
+		plt.title('std of human'+str(param['std'])+',lamb'+str(param['lamb']))
+		plt.xlabel('Fraction of Input to Machine')
+		plt.ylabel('Average Squared Error')
+		plt.grid(True)
+		plt.legend()
+		plt.savefig(image_file)
+		plt.show()
+
+def main():
+	list_of_std=np.array([0.05,.1])#([.05,.1,.5])#([0.001,0.01,0.1,0.5,1]) np.array([.1])#([0.001,0.01,0.1,0.5,1]) 
+	list_of_K=[0.1,0.2,0.3,.4,0.5,.6,.7,.8]
+	list_of_lamb=[0.5]#[0.5,1.0]#[0.01,0.1,0.5,1.0]
+	data_file='../Synthetic_data/data_sigmoid'
+	res_file='../Synthetic_data/res_sigmoid'
+	res_plot_file='../Synthetic_data/res_sigmoid_for_plot'
+	image_file_prefix='../Synthetic_data/plot_sigmoid_'
+	obj=plot_triage(list_of_K,list_of_std, list_of_lamb)
+	obj.extract_result( res_file, res_plot_file)
+	obj.plot_result(res_plot_file,image_file_prefix)
+
+
+if __name__=="__main__":
+	main()
