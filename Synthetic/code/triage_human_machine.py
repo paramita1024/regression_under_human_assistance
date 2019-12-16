@@ -272,22 +272,22 @@ class triage_human_machine:
 		
 		# Submod_ratio = Submodularity_ratio({'X':self.X,'Y':self.Y,'c':self.c,'lamb':self.lamb}) 
 		
-		delta = 0.01
+		delta = 0.05
 		# arr = np.array([int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) ))) for Submod_ratio in [.5,.6,.7,.8,.9]])
 		Submod_ratio = 0.7
-		T=int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) )))
+		T=20 #int(math.ceil( (1/delta)* np.log( 1/max(delta,Submod_ratio) )))
 		subset = {}
 		G_subset=[]
 		gamma = 1.0
 		# print T
 		start = time.time()
 		for r in range(T+1): 
-			print r
+			#print r
 			subset_sel = self.distort_greedy(g,self.K,gamma) 
 			subset[str(r)] = subset_sel
 			G_subset.append( g.eval(subset_sel))
 			gamma = gamma*(1-delta)
-		print time.time() - start
+		#print time.time() - start
 		empty_set = np.array([]).astype(int)
 		subset[str(T+1)]=empty_set
 		G_subset.append( g.eval(empty_set))
