@@ -40,7 +40,7 @@ class eval_triage:
 						res[str(std)][str(K)][str(lamb)]={}
 					# res[str(std)][str(K)][str(lamb)]['greedy'] = triage_obj.algorithmic_triage({'K':K,'lamb':lamb},optim='greedy')
 					print 'std-->', std, 'K--> ',K,' Lamb--> ',lamb
-					res_dict = triage_obj.algorithmic_triage({'K':K,'lamb':lamb},optim=option)
+					res_dict = triage_obj.algorithmic_triage({'K':K,'lamb':lamb, 'DG_T': param['DG_T']},optim=option)
 					res[str(std)][str(K)][str(lamb)][option] = res_dict
 		save(res,res_file)
 
@@ -49,18 +49,22 @@ def main():
 	
 	list_of_std = [0.001]#,.005,0.01,.05]
 	list_of_K=[0.1,0.2,0.3,.4,0.5,.6,.7,.8,.9] # [0.99] # [0.2,0.6,0.8]#[0.01,0.1,0.2,0.3,.4,0.5,.6,.7,.8,.9,.99]
-	list_of_lamb= [0.001]#,0.005,0.01,0.05] #[0.01,0.05] [.1,.5] # [0.0001,0.001,0.01,0.1,.4,.6,.8]#[[int(sys.argv[2])]] # [0.0001,0.001,0.01,0.1] #
+	list_of_lamb= [0.005]#,0.005,0.01,0.05] #[0.01,0.05] [.1,.5] # [0.0001,0.001,0.01,0.1,.4,.6,.8]#[[int(sys.argv[2])]] # [0.0001,0.001,0.01,0.1] #
 	
-	file_name = 'sigmoid' # 'Gauss'
+	file_name = 'Gauss_n500d5' # 'Gauss'
+	if 'Gauss' in file_name:
+		DG_T = 10
+	if 'sigmoid' in file_name:
+		DG_T = 20
 	data_file='../Synthetic_data/data_dict_' + file_name
 	res_file='../Synthetic_data/res_' + file_name
 	obj=eval_triage(data_file,real_wt_std=True)
-	list_of_option = ['kl_triage','greedy','distort_greedy','diff_submod']
+	list_of_option = ['kl_triage','greedy','distort_greedy']#,'diff_submod']
 	for option in list_of_option:
 		if option == 'diff_submod':
-			param={'std':list_of_std,'K':list_of_K,'lamb':list_of_lamb}
+			param={'std':list_of_std,'K':list_of_K,'lamb':list_of_lamb, 'DG_T': DG_T}
 		else:
-			param={'std':list_of_std,'K':0.99,'lamb':list_of_lamb}
+			param={'std':list_of_std,'K': 0.99 ,'lamb':list_of_lamb, 'DG_T': DG_T}
 		obj.eval_loop(param,res_file,option) 
 	
 
