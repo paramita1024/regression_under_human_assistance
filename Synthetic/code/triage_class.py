@@ -168,8 +168,8 @@ class modular_distort_greedy:
 
 		G_ascend = np.array( [ self.g.eval( np.arange(i+1) ) - self.g.eval(np.arange(i)) for i in self.V ] )
 		self.w =  np.array([ np.max(np.array([0.0,G_ascend[i]])) for i  in self.V ])
-		print 'max w ', np.max( self.w)
-		print 'min w' , np.min( self.w)
+		#print 'max w ', np.max( self.w)
+		#print 'min w' , np.min( self.w)
 
 	def eval(self,subset):
 		return self.null_val +self.w[subset].sum() # ( )
