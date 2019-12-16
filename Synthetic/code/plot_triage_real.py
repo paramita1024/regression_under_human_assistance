@@ -298,6 +298,8 @@ def main():
 	list_of_option=['greedy','kl_triage','distort_greedy','diff_submod']
 	obj=plot_triage_real(list_of_K, list_of_std, list_of_lamb, list_of_option, list_of_test_option)
 	for option in list_of_option:
+		if option not in ['diff_submod']:
+			obj.split_res_over_K( data_file, res_file, 0.99, option)
 		obj.compute_result(res_file,data_file,option, image_demo_prefix)
 	obj.get_avg_error_vary_K(res_file,image_path)
 	# obj.plot_err_vary_std_K(res_file,res_file_txt,500)
