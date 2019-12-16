@@ -57,7 +57,10 @@ def main():
 	obj=eval_triage(data_file,real_wt_std=True)
 	list_of_option = ['kl_triage','greedy','distort_greedy','diff_submod']
 	for option in list_of_option:
-		param={'std':list_of_std,'K':list_of_K,'lamb':list_of_lamb}
+		if option == 'diff_submod':
+			param={'std':list_of_std,'K':list_of_K,'lamb':list_of_lamb}
+		else:
+			param={'std':list_of_std,'K':0.99,'lamb':list_of_lamb}
 		obj.eval_loop(param,res_file,option) 
 	
 
