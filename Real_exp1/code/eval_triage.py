@@ -1,6 +1,7 @@
 import time
 import os
 import sys 
+import getopt
 from myutil import *
 import numpy as np
 import numpy.random as rand
