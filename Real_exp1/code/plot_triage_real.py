@@ -1,3 +1,4 @@
+import getopt
 import time
 import matplotlib
 matplotlib.use('Agg')
@@ -61,13 +62,14 @@ class plot_triage_real:
 		
 					plot_obj={}
 					for option in self.list_of_option:
-						err_K_te=[]
+					    	
+                                                err_K_te=[]
 						for K in self.list_of_K:
 							err_K_te.append(res[str(std)][str(K)][str(lamb)][option]['test_res'][test_method]['error'])
 						
-						plot_obj[option]={'train':err_K_tr,'test':err_K_te}
+						plot_obj[option]={'test':err_K_te}
 					
-					self.plot_err_vs_K(image_file,plot_obj)
+					self.plot_err_vs_K(image_path,plot_obj)
 
 	def get_avg_error_exp3(self,res_file,image_path):
 		
@@ -88,10 +90,10 @@ class plot_triage_real:
 				
 				
 				
-			self.plot_err_vs_K(image_file,plot_obj)
+			self.plot_err_vs_K(image_path,plot_obj)
 			K_col = np.array([ int(k*self.n) for k in self.list_of_K ])		
 			plot_arr = np.hstack(( K_col.reshape(K_col.shape[0],1), plot_arr.T))
-			self.write_to_txt(plot_arr, image_file+'.txt')
+			self.write_to_txt(plot_arr, image_path+'.txt')
 		print '\\caption{'+res_file.split('/')[-1].split('_')[0]+'}'
 		print '\\end{figure}'
 

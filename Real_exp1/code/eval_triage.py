@@ -1,7 +1,7 @@
+import getopt
 import time
 import os
 import sys 
-import getopt
 from myutil import *
 import numpy as np
 import numpy.random as rand
@@ -13,7 +13,7 @@ from triage_human_machine import triage_human_machine
 def parse_command_line_input( list_of_option, list_of_file_name ):
 
     argv = sys.argv[1:]
-    opts, args = getopt.getopt(argv, 's:l:o:f:', ['std','lamb','option', 'file_name'])
+    opts, args = getopt.getopt(argv, 's:l:f:', ['std','lamb','file_name'])
 
     std=0.0
     lamb=0.5
@@ -27,11 +27,6 @@ def parse_command_line_input( list_of_option, list_of_file_name ):
         if opt == '-l':
             lamb = float(arg)
 
-        if opt == '-o':
-        	for option_i in list_of_option:
-        		if option_i.startswith( arg ):
-        			option = option_i
-
         if opt == '-f':
             for file_name_i in list_of_file_name:
                 #print file_name_i
@@ -40,7 +35,17 @@ def parse_command_line_input( list_of_option, list_of_file_name ):
             		file_name = file_name_i
 
         
-    return std, lamb, option, file_name
+    return std, lamb, file_name
+
+def print_new_pca_data( data_file_old, data_file_new,n):
+	data=load_data( data_file_old )
+	data['X']=data['X'][:,:n]
+	data['test']['X']=data['test']['X'][:,:n]
+	save( data, data_file_new)
+
+def relocate_data( data_file_old, data_file_new ):
+	data=load_data( data_file_old)
+	save( data, data_file_new )
 
 class eval_triage:
 	
@@ -81,10 +86,10 @@ class eval_triage:
 
 def main():
 
-	list_of_option =['greedy','distort_greedy','kl_triage','diff_submod']
+	list_of_option =['diff_submod'] # ['greedy','distort_greedy','kl_triage','diff_submod']
 	list_of_file_name = ['stare5','stare11','messidor', 'hatespeech'] 
 
-	std, lamb, option, file_name = parse_command_line_input( list_of_option, list_of_file_name )
+	std, lamb, file_name = parse_command_line_input( list_of_option, list_of_file_name )
 	list_of_std =[ std ]
 	list_of_lamb=[ lamb ] 
 
